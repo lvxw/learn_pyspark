@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 
 import sys
-
+from pyspark import SparkContext, SparkConf
 
 def run(input_path, output_path):
-    from pyspark import SparkContext, SparkConf
+
     conf = SparkConf()\
         .set("spark.hadoop.validateOutputSpecs", "false") \
         .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")\
@@ -13,7 +13,7 @@ def run(input_path, output_path):
     sc = SparkContext(conf=conf)
     rdd = sc.textFile(input_path)
 
-    re = rdd.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).reduceByKey(lambda x, y: x+y).sortBy(lambda x: x[1], False)
+    re = rdd.flatMap(lambda x: x.split(' ')).map(lambda x: (x, 1)).reduceByKey(lambda x, y: x+y).map(lambda x : x[0]+","+str(x[1]))
 
     re.saveAsTextFile(output_path)
 
